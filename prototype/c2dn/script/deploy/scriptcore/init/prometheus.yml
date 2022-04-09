@@ -1,0 +1,92 @@
+# my global config
+global:
+  scrape_interval:     5s
+  evaluation_interval: 30s
+  # scrape_timeout is set to the global default (10s).
+
+  external_labels:
+    monitor: codelab
+    foo:     bar
+
+# rule_files:
+# - "first.rules"
+# - "my/*.rules"
+
+# remote_write:
+#   - url: http://remote1/push
+#     name: drop_expensive
+#     write_relabel_configs:
+#     - source_labels: [__name__]
+#       regex:         expensive.*
+#       action:        drop
+#   - url: http://remote2/push
+#     name: rw_tls
+#     tls_config:
+#       cert_file: valid_cert_file
+#       key_file: valid_key_file
+
+# remote_read:
+#   - url: http://remote1/read
+#     read_recent: true
+#     name: default
+#   - url: http://remote3/read
+#     read_recent: false
+#     name: read_special
+#     required_matchers:
+#       job: special
+#     tls_config:
+#       cert_file: valid_cert_file
+#       key_file: valid_key_file
+
+scrape_configs:
+- job_name: prometheus
+
+  honor_labels: true
+  # file_sd_configs:
+  #   - files:
+  #     - foo/*.slow.json
+  #     - foo/*.slow.yml
+  #     - single/file.yml
+  #     refresh_interval: 10m
+  #   - files:
+  #     - bar/*.yaml
+
+  static_configs:
+  - targets: ['localhost:9090', 'localhost:9191']
+    labels:
+      my:   label
+      your: label
+
+  # relabel_configs:
+  # - source_labels: [job, __meta_dns_name]
+  #   regex:         (.*)some-[regex]
+  #   target_label:  job
+  #   replacement:   foo-${1}
+  #   # action defaults to 'replace'
+  # - source_labels: [abc]
+  #   target_label:  cde
+  # - replacement:   static
+  #   target_label:  abc
+  # - regex:
+  #   replacement:   static
+  #   target_label:  abc
+
+  # bearer_token_file: valid_token_file
+
+
+  # - job_name: service-ec2
+  #   ec2_sd_configs:
+  #     - region: us-east-1
+        # access_key: access
+        # secret_key: mysecret
+        # profile: profile
+        # filters:
+        #   - name: tag:environment
+        #     values:
+        #       - prod
+
+        #   - name: tag:service
+        #     values:
+        #       - web
+        #       - db
+

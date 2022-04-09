@@ -1,0 +1,178 @@
+job_name:
+  atsTest
+local_preprocessing:
+  mydir=$(pwd) && cd ~/GDCMU/1810AkamaiCDNCoding/workspace/ && tar --exclude='.git' --exclude='output' --exclude='data' --exclude='cmake-build-debug' -zcf CDNSimulator.tar.gz CDNSimulator/ && mv CDNSimulator.tar.gz $mydir;
+
+local_postprocessing:
+  rm CDNSimulator.tar.gz
+
+
+VM:
+  origin:
+    region:
+    ami_id:
+    instance_type:
+    spot_instance:
+    userdata:
+
+  CDN:
+    number:
+    region:
+    ami_id:
+    vpc: vpc-0bab30f8e17919792
+    instance_type:
+    spot_instance:
+    # Exec format error happens if there are empty lines at the head of file
+    userdata: >
+    #!/bin/bash
+
+    timedatectl set-timezone America/New_York;
+    apt-get update
+    apt-get install -yqq gcc g++ make cmake git autogen autoconf automake yasm nasm libtool libboost-all-dev
+    touch /home/ubuntu/userdata.done
+
+    echo '[default]' > $HOME/.aws/config; echo 'region = us-east-1' >> $HOME/.aws/config; echo  >> $HOME/.aws/config;
+    echo '[default]' > $HOME/.aws/credentials; echo 'aws_access_key_id = AKIAJBO3GKVKFBAWA4LA' >> $HOME/.aws/credentials; echo 'aws_secret_access_key = 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' >> $HOME/.aws/credentials;
+    echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBXC0SVYzWKbdGybQoqXhqDv/KCSiln7LlEQkuKtTttTNo59mGruHOedms3swKPC6zUETA37Db6CYFWapyufNsfLgB92UmVrwNS428Ccs9lDH6K4XaIqnYZVNvb1clrg9aJvD1nDSNjqnt6076yxvIo671DP04+FNw257fsHJKT058XsBHiKvjWjtwtn3Ix8PQgOm7L4ytsdrfM2H28j0Pk8809u27pbBgCSSjrocyt0dWWQIMqZ6SBr3FzsiJ/yF1zmVGUP+v71hDbhvrITO0hxAiPRRvL+/wQw+BDLWyC+/t8aZBFxALZMd4oyg7OtCvWuP9fNV/q5pzcEnrphNh jason@anon114.mathcs.emory.edu' >> $HOME/.ssh/authorized_keys;
+    echo "$(date +%H:%M:%S) setting restored" >>> /home/ubuntu/userdata.done
+
+    cd /home/ubuntu;
+    mkdir -p software/source 2>/dev/null;
+    cd /home/ubuntu/software/source;
+    wget http://apache.claz.org/trafficserver/trafficserver-8.0.2.tar.bz2;
+    tar xvf trafficserver-8.0.2.tar.bz2;
+    cd trafficserver-8.0.2;
+    ./configure --prefix=$HOME/CDN/ATSRelease/
+    make -j48
+    make install;
+    echo "$(date +%H:%M:%S) ATS installed" >>> /home/ubuntu/userdata.done
+
+    wget https://github.com/01org/isa-l/archive/v2.25.0.tar.gz
+    tar xvf v2.25.0.tar.gz; cd isa-l-2.25.0;
+    ./autogen.sh;
+    ./configure --prefix=/usr --libdir=/usr/lib;
+    make -j48;
+    make install;
+    echo "$(date +%H:%M:%S) ISAL installed" >>> /home/ubuntu/userdata.done
+
+  client:
+    region:
+    ami_id:
+    instance_type:
+    spot_instance:
+    userdata:
+
+  default:
+    number:
+    region:
+    ami_id:
+    instance_type:
+    spot_instance:
+    use_existing_instance:
+    priv_key_file:
+    userdata:
+
+
+
+
+
+
+
+ec2_params:
+  ami_id: ami-0ca70ab9de534d4a6
+  userdata: >
+    #!/bin/bash
+    timedatectl set-timezone America/New_York;
+
+    apt-get update; apt install -yqq python3-pip gcc g++ python3-matplotlib cmake unzip; pip3 install psutil;
+
+    echo '[default]' > $HOME/.aws/config; echo 'region = us-east-1' >> $HOME/.aws/config; echo  >> $HOME/.aws/config;
+
+    echo '[default]' > $HOME/.aws/credentials; echo 'aws_access_key_id = AKIAJBO3GKVKFBAWA4LA' >> $HOME/.aws/credentials; echo 'aws_secret_access_key = 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' >> $HOME/.aws/credentials;
+
+    echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBXC0SVYzWKbdGybQoqXhqDv/KCSiln7LlEQkuKtTttTNo59mGruHOedms3swKPC6zUETA37Db6CYFWapyufNsfLgB92UmVrwNS428Ccs9lDH6K4XaIqnYZVNvb1clrg9aJvD1nDSNjqnt6076yxvIo671DP04+FNw257fsHJKT058XsBHiKvjWjtwtn3Ix8PQgOm7L4ytsdrfM2H28j0Pk8809u27pbBgCSSjrocyt0dWWQIMqZ6SBr3FzsiJ/yF1zmVGUP+v71hDbhvrITO0hxAiPRRvL+/wQw+BDLWyC+/t8aZBFxALZMd4oyg7OtCvWuP9fNV/q5pzcEnrphNh jason@anon114.mathcs.emory.edu' >> $HOME/.ssh/authorized_keys;
+
+  # instance_type: r5.24xlarge
+  instance_type: x1.32xlarge
+  # instance_type: r5.4xlarge # 128GB/16Core
+  # instance_type: x1e.xlarge   # 128GB/4Core
+  # instance_type: t2.small
+  # n_instance: 0     # use 0 for one CPU per task
+  spot_instance: True
+  use_existing_instances: False
+  n_task_per_instance: 128
+  # priv_key_file: $HOME/.ssh/awsRashmi.pem
+  priv_key_file: $HOME/.ssh/id_rsa
+
+ec2_monitoring:
+  script: jobMonitor.py
+  params:
+    - simulator
+    - "~/CDNSimulator/script/log*"
+    - jasondatadeletable/CDN
+    - AkamaiBinLargeSizeX1
+    - terminate
+
+ec2_job_files:
+  - CDNSimulator.tar.gz
+
+
+ec2_job_setup:
+  - sudo timedatectl set-timezone America/New_York
+  - killall -9 simulator 2>/dev/null;
+  - killall -9 python3 2>/dev/null;
+  - rm -rf CDN_Simulator CDNSimulator data 2>/dev/null
+  - mkdir -p data/akamai/ 2>/dev/null
+  - tar xf CDNSimulator.tar.gz;
+  - find . -name ._* -delete 2>/dev/null
+  - cd $HOME/CDNSimulator; mkdir build; cd build; cmake ..; make -j8; cp simulator ../script/;
+  #
+  # - rm monitor* ip* *sha* 2>/dev/null
+  # - sudo rm -r disk1 disk2 disk3 disk4 2>/dev/null
+  # - mkdir disk1 disk2 disk3 disk4 2>/dev/null
+  #
+  # - echo -e "o\nn\np\n1\n\n\nw" | sudo fdisk /dev/xvdb
+  # - echo -e "y\n\n" | sudo mkfs.ext4 /dev/xvdb
+  # - sudo mount /dev/xvdb disk1
+  # - echo -e "o\nn\np\n1\n\n\nw" | sudo fdisk /dev/xvdc
+  # - echo -e "y\n\n" | sudo mkfs.ext4 /dev/xvdc
+  # - sudo mount /dev/xvdc disk2
+  #
+  # - echo -e "o\nn\np\n1\n\n\nw" | sudo fdisk /dev/nvme1n1
+  # - echo -e "y\n\n" | sudo mkfs.ext4 /dev/nvme1n1
+  # - sudo mount /dev/nvme1n1 disk1
+  # - echo -e "o\nn\np\n1\n\n\nw" | sudo fdisk /dev/nvme2n1
+  # - echo -e "y\n\n" | sudo mkfs.ext4 /dev/nvme2n1
+  # - sudo mount /dev/nvme2n1 disk2
+
+  # - echo -e "o\nn\np\n1\n\n\nw" | sudo fdisk /dev/nvme3n1
+  # - echo -e "y\n\n" | sudo mkfs.ext4 /dev/nvme3n1
+  # - sudo mount /dev/nvme3n1 disk3
+  # - echo -e "o\nn\np\n1\n\n\nw" | sudo fdisk /dev/nvme4n1
+  # - echo -e "y\n\n" | sudo mkfs.ext4 /dev/nvme4n1
+  # - sudo mount /dev/nvme4n1 disk4
+  - sudo chown -R ubuntu:ubuntu disk1 disk2 disk3 disk4
+  - aws s3 cp s3://jasondatavaluable/akamai/akamai.bin $HOME/disk1/
+  - sha1sum $HOME/disk1/akamai.bin > ~/akamai.bin.sha1
+
+
+ec2_task_command:
+  # it is important to return pid for monitoring program to track
+  # cd $HOME/CDNSimulator/script/; screen -Sdm simulator bash -c "./simulator -d $HOME/data/akamai/akamai1.merge.sort -t akamai1 -a lrusize -m 7 -l 2000000 -o 1 -u 0 -s ***param_s_param*** -n ***param_n_param*** -k ***param_k_param*** -x ***param_x_param*** -z ***param_z_param***"
+  cd $HOME/CDNSimulator/script/; screen -SLdm simulator bash -c "./simulator -d $HOME/disk1/akamai.bin -t akamai1b -a lrusize -m 40 -l 2000000 -o 1 -u 0 -s ***param_s_param*** -n ***param_n_param*** -k ***param_k_param*** -x ***param_x_param*** -z ***param_z_param***"
+  # cd $HOME/CDNSimulator/script/; screen -SLdm simulator bash -c "./simulator -d $HOME/data/akamai.merge.sort -t akamai1 -a lrusize -m 10 -l 2000000 -o 1 -u 0 -s ***param_s_param*** -n ***param_n_param*** -k ***param_k_param*** -x ***param_x_param*** -z ***param_z_param***"
+
+
+
+ec2_task_comb:
+  # s: [10000000, 30000000, 60000000, 100000000, 300000000, 600000000, 1000000000, 3000000000, 6000000000, 10000000000, 30000000000, 60000000000, 100000000000, 200000000000, 400000000000, 800000000000, 1200000000000]
+  # s: [100000000, 1000000000, 3000000000, 6000000000, 10000000000, 30000000000, 60000000000, 100000000000, 600000000000]
+  s: [80000000000, 120000000000, 160000000000, 240000000000, 400000000000, 800000000000, 1200000000000, 2000000000000]
+  # s: [2000000000, 4000000000, 6000000000, 8000000000, 10000000000, 30000000000, 60000000000, 100000000000, 200000000000]
+  # z: [0, 32, 256, 2048, 16384]
+  z: [0, 32, 512, 2048]
+  "n:k:x": [[2,1,0], [2,1,1], [4,3,1], [8,7,1]]   # [6,3,0], [6,3,1], [8,7,0], [8,7,1],
+  # "n:k:x": [[2,1,0], [2,1,1], [4,3,0], [4,3,1]]
+  # s: [2000000000, ]
+  # z: [0, ]
+  # "n:k:x": [[2,1,0], ]

@@ -1,0 +1,83 @@
+HTTP/1.1 200 OK
+Date: Tue, 12 Mar 2019 21:15:05 GMT
+Access-Control-Allow-Origin: *
+Cache-Control: max-age=10800, public
+Content-Type: text/html; charset=utf-8
+Content-Length: 30
+Origin: True
+Age: 0
+
+<!DOCTYPE html><html id=abcde>
+
+
+
+
+
+
+
+
+
+
+
+
+PUSH http://asrock.jasony.me:8080/push3.html HTTP/1.0
+Content-Length: 306
+
+HTTP/1.0 200 OK
+Content-type: text/plain; charset=us-ascii
+
+Content-length: 221
+
+HTTP/1.1 200 OK
+Server: gunicorn/19.9.0
+Date: Tue, 12 Mar 2019 21:46:04 GMT
+Connection: keep-alive
+Content-Type: text/html; charset=utf-8
+Content-Length: 25
+Origin: True
+ObjType: full
+
+*************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PUSH http://asrock.jasony.me:8080/push4 HTTP/1.0
+Content-Length: 113
+
+HTTP/1.0 200 OK
+Content-type: text/plain; charset=us-ascii
+
+Content-length: 29
+
+*************************
+
+
+
+
+
+
+
+
+HTTP/1.0 200 OK
+Date: Wed, 13 Mar 2019 03:39:23 GMT
+Via: http/1.1 asrock (ApacheTrafficServer/8.0.2 [c s f ])
+Server: ATS/8.0.2
+Content-Length: 0
+
+
+
+
+
+"HTTP/1.0 200 OK${CRLF}Content-type: ${f_type}${CRLF}Content-length: ${len_content}${CRLF}${CRLF}${f}${CRLF}";

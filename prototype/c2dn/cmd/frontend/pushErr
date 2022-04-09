@@ -1,0 +1,58 @@
+This files lists all possible error get during push
+
+
+HTTP/1.0 400 Invalid HTTP Request
+Date: Wed, 13 Mar 2019 03:55:32 GMT
+Via: http/1.1 asrock (ApacheTrafficServer/8.0.2 [c s f ])
+Server: ATS/8.0.2
+Cache-Control: no-store
+Content-Type: text/html
+Content-Language: en
+Content-Length: 219
+
+<HTML>
+<HEAD>
+<TITLE>Bad Request</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" FGCOLOR="black">
+<H1>Bad Request</H1>
+<HR>
+
+<FONT FACE="Helvetica,Arial"><B>
+Description: Could not process this request.
+</B></FONT>
+<HR>
+</BODY>
+
+
+
+
+
+
+
+HTTP/1.1 400 Cache Write Failed
+Date: Mon, 25 Mar 2019 18:28:23 GMT
+Connection: close
+Via: http/1.1 CDN-testLat_ARCH1_4_3_1-4 (ApacheTrafficServer/8.0.2 [c s f ])
+Server: ATS/8.0.2
+Cache-Control: no-store
+Content-Type: text/html
+Content-Language: en
+Content-Length: 207
+
+<HTML>
+<HEAD>
+<TITLE>Error</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" FGCOLOR="black">
+<H1>Error</H1>
+<HR>
+
+<FONT FACE="Helvetica,Arial"><B>
+Description: Could not process this request.
+</B></FONT>
+<HR>
+</BODY>
+

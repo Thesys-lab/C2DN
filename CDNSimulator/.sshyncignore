@@ -1,0 +1,7 @@
+.git
+cmake-build*
+*.pyc
+*.png
+*.pdf
+*old*
+
